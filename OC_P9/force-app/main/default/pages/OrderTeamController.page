@@ -1,0 +1,17 @@
+<apex:page controller="OrderTeamController">        
+ 
+    <h1>Montant Total des commandes par commercial</h1>
+    <apex:pageBlock title="Total des commandes par commercial">
+        <apex:pageBlockTable value="{!aggregateResultList}" var="agResultObj">
+            <apex:column value="{!agResultObj['ordCount']}">
+                <apex:facet name="header">Nombre de commande</apex:facet>
+            </apex:column>
+            <apex:column value="{!agResultObj['ordSum']}">
+                <apex:facet name="header">Montant Total</apex:facet>
+            </apex:column>
+            <apex:column value="{!agResultObj['ordName']}">
+                <apex:facet name="header">Commercial</apex:facet>
+            </apex:column>
+        </apex:pageBlockTable>   
+    </apex:pageBlock>
+</apex:page>
