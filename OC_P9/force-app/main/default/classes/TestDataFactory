@@ -1,0 +1,107 @@
+@isTest
+public class TestDataFactory {
+    
+     public static Account createAccountsOrderItem(Integer numOrderPerAcct) {
+         
+        //creer un compte
+        Account acc =  new Account(Name='Compte test', Description='test', Chiffre_d_Affaire__c=0);
+        insert acc;
+         
+        // creer un contrat       
+        Contract cont = new Contract(AccountId=acc.Id, Status='Draft', StartDate=Date.TODAY(), ContractTerm=1, Description='test');
+        insert cont;
+         
+        // Creer un catalogue de prix 
+        Pricebook2 priceBook = new Pricebook2(
+            Name = 'Example Price Book',
+            Description = 'This is the Price Book description.',
+            IsActive = true
+        );
+		insert priceBook;
+
+        // Create a Product        
+        Product2 product = new Product2(
+            Name = 'Example Product',
+            Description = 'This is the Product description.',
+            ProductCode = 'EX1234',
+            StockKeepingUnit = 'EX5678',
+            Family = 'Example Product Family',
+            QuantityUnitOfMeasure = 'inches',
+            DisplayUrl = 'https://www.example.com/',
+            ExternalId = 'ID #1234',           
+            IsActive = true
+        );
+		insert product;
+
+        // Standard PriceBookID        
+        Pricebook2 standardPricebook = new Pricebook2(
+    	Id = Test.getStandardPricebookId(),
+    	IsActive = true
+		);
+
+        // Insertion de produit dans le catalogue de prix        
+        PricebookEntry standardPriceBookEntry = new PricebookEntry(
+            Pricebook2Id = standardPriceBook.Id,
+            Product2Id = product.Id,
+            UnitPrice = 100.00,
+            UseStandardPrice = false,
+            IsActive = true
+        );        
+        insert standardPriceBookEntry;
+
+        // Insertion de produit dans Entrée au catalogue de prix        
+        PricebookEntry priceBookEntry = new PricebookEntry(
+            Pricebook2Id = priceBook.Id,
+            Product2Id = product.Id,
+            UnitPrice = 100.00,
+            UseStandardPrice = false,
+            IsActive = true
+        );        
+        insert priceBookEntry;
+
+        // creer X commande 
+        List<Order> commandes = new list<Order>();
+        for(integer i=0; i<numOrderPerAcct; i++){
+            Order comm = new Order(
+            	ContractId=cont.Id,
+            	Status = 'Draft',
+                AccountId = acc.Id,
+                EffectiveDate=Date.TODAY(),
+                ShipmentCost__c=10,
+                Description='Test',
+                Pricebook2Id=PriceBook.Id               
+            );
+            commandes.add(comm);           
+    }
+           insert commandes; 
+         
+         
+       // insertion  produits commandés 
+       
+
+        List<OrderItem> listoi = new List<OrderItem>();
+        for (Integer j= 0; j<numOrderPerAcct; j++){
+            OrderItem oi1 = new OrderItem(OrderId = commandes[j].id,
+                                          PricebookEntryId =priceBookEntry.Id,
+                                          UnitPrice=100,
+                                          Quantity=1);
+            
+            listoi.add(oi1);
+            
+           
+        }
+
+         insert listoi;
+  	
+        
+      	update commandes;
+         update listoi;
+       
+        
+         
+         return acc;
+         
+         
+
+	}
+}
